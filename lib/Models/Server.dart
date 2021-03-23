@@ -14,7 +14,7 @@ class Server {
     var result = await coll.findOne(
         where.eq('username', username).and(where.eq('password', password)));
     if (result != null) {
-      return result;
+      return User.fromJson(result);
     }
     return false;
   }

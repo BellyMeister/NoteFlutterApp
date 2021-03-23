@@ -34,6 +34,8 @@ dependencies:
     
   sevr: ^1.0.4
 
+  equatable: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
