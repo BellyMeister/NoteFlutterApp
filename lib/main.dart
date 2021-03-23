@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'extensions.dart';
 
 void main() {
   runApp(MyApp());
