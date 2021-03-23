@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'Models/Server.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -11,8 +11,15 @@ class Login extends StatelessWidget {
   final password = TextEditingController();
 
   void login() {
-    print(username.text);
-    print(password.text);
+    Server server = new Server();
+
+    var success = server.login(username.text, password.text);
+
+    success.whenComplete(() => print(success.toString()));
+  }
+
+  void register() {
+    // manger function is server
   }
 
   @override
@@ -71,6 +78,13 @@ class Login extends StatelessWidget {
               child: ElevatedButton(
                 child: Text('Login'),
                 onPressed: () => {login()},
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: ElevatedButton(
+                child: Text('Login'),
+                onPressed: () => {register()},
               ),
             ),
           ],
