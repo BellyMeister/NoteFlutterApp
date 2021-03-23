@@ -73,20 +73,30 @@ class Login extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                child: Text('Login'),
-                onPressed: () => {login()},
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                child: Text('Login'),
-                onPressed: () => {register()},
-              ),
-            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Align(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF21E6C1),
+                    ),
+                    child: Text('register'),
+                    onPressed: () => {register()},
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFF21E6C1),
+                    ),
+                    child: Text('Login'),
+                    onPressed: () => {login()},
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
