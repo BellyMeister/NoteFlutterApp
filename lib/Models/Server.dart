@@ -28,4 +28,14 @@ class Server {
     }
     return new User();
   }
+
+  Future<User> registerNewUser(User user) async {
+    DbCollection coll = await start();
+    await coll.insertOne(user.toJson());
+    var newUser = await coll.findOne();
+    if (newUser != null) {
+      return User.fromJson(newUser);
+    }
+    return new User();
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Models/Note.dart';
 import 'Models/Server.dart';
 import 'package:flutter/material.dart';
 import 'Models/User.dart';
@@ -23,6 +24,8 @@ class _LoginState extends State<Login> {
     var user_id = prefs.getString('user_id') ?? false;
     Server server = new Server();
     User user = new User();
+
+    //skal flyttes ud her fra!
     if (user_id != false) {
       user = await server.loginWithId(user_id);
       // vidre til seppis side!
@@ -46,7 +49,14 @@ class _LoginState extends State<Login> {
   }
 
   void register() {
-    // manger function is server
+    Server server = new Server();
+    User user = new User();
+    user.username = username.text;
+    user.name = username.text;
+    user.password = password.text;
+
+    user.notes = <Note>[];
+    server.registerNewUser(user);
   }
 
   @override
