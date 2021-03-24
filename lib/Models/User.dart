@@ -1,24 +1,24 @@
-import 'Label.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+
 import 'Note.dart';
 
 class User {
-  Id iId;
+  ObjectId id;
   String name;
   String username;
   String password;
   List<Note> notes;
-  List<Label> labels;
 
-  User(
-      {this.iId,
-      this.name,
-      this.username,
-      this.password,
-      this.notes,
-      this.labels});
+  User({
+    this.id,
+    this.name,
+    this.username,
+    this.password,
+    this.notes,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
-    iId = json['_id'] != null ? new Id.fromJson(json['_id']) : null;
+    id = json['_id'] != null ? json['_id'] : "";
     name = json['name'];
     username = json['username'];
     password = json['password'];
@@ -28,44 +28,17 @@ class User {
         notes.add(new Note.fromJson(v));
       });
     }
-    if (json['labels'] != null) {
-      labels = <Label>[];
-      json['labels'].forEach((v) {
-        labels.add(new Label.fromJson(v));
-      });
-    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.iId != null) {
-      data['_id'] = this.iId.toJson();
-    }
+    data['_id'] = this.id;
     data['name'] = this.name;
     data['username'] = this.username;
     data['password'] = this.password;
     if (this.notes != null) {
       data['notes'] = this.notes.map((v) => v.toJson()).toList();
     }
-    if (this.labels != null) {
-      data['labels'] = this.labels.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Id {
-  String oid;
-
-  Id({this.oid});
-
-  Id.fromJson(Map<String, dynamic> json) {
-    oid = json['$oid'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['$oid'] = this.oid;
     return data;
   }
 }
