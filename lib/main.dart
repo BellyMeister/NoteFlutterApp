@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_flutter_app/login.dart';
+import 'extensions.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,7 +28,11 @@ class MyApp extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        backgroundColor: HexColor.fromHex("#112D52"),
+        primaryColor: HexColor.fromHex("#21E6C1"),
+        accentColor: HexColor.fromHex("#1D416F"),
         primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
       ),
       home: Login(),
     );
