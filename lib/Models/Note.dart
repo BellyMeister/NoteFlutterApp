@@ -21,7 +21,8 @@ class Note {
 
   Note.fromJson(Map<String, dynamic> json) {
     title = json['title'];
-    type = NoteType.values[json['type']];
+    type = NoteType.values
+        .firstWhere((e) => e.toString() == 'NoteType.' + json['type']);
     bodyText = json['bodyText'];
     if (json['labels'] != null) {
       labels = <Label>[];
