@@ -21,18 +21,19 @@ class _LoginState extends State<Login> {
   void login(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     var user_id = prefs.getString('user_id') ?? false;
-    if (user_id != false) {
-      // man logger ind med user id her!
-      print(user_id);
-    }
-    // gør det samme som før
     Server server = new Server();
+    User user = new User();
+    if (user_id != false) {
+      user = await server.loginWithId(user_id);
+      // vidre til seppis side!
+      return;
+    }
 
-    User user = await server.login(username.text, password.text);
+    user = await server.login(username.text, password.text);
     if (user.username != null) {
       // Navigator.push(Main())
 
-      prefs.setString('user_id', user.id.toString());
+      prefs.setString('user_id', user.id.toHexString());
     } else {
       showDialog(
           context: context,

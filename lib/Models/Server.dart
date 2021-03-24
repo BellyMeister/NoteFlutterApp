@@ -18,4 +18,14 @@ class Server {
     }
     return new User();
   }
+
+  Future<User> loginWithId(String sid) async {
+    ObjectId id = ObjectId.parse(sid);
+    DbCollection coll = await start();
+    var result = await coll.findOne(where.eq('_id', id));
+    if (result != null) {
+      return User.fromJson(result);
+    }
+    return new User();
+  }
 }
