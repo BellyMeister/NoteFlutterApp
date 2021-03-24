@@ -1,21 +1,47 @@
-import 'dart:developer';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'Models/Server.dart';
 import 'package:flutter/material.dart';
+import 'Models/User.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   Login({
     Key key,
   }) : super(key: key);
 
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   final username = TextEditingController();
+
   final password = TextEditingController();
 
-  void login() {
+  void login(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    var user_id = prefs.getString('user_id') ?? false;
+    if (user_id != false) {
+      // man logger ind med user id her!
+      print(user_id);
+    }
+    // gør det samme som før
     Server server = new Server();
 
-    var success = server.login(username.text, password.text);
+    User user = await server.login(username.text, password.text);
+    if (user.username != null) {
+      // Navigator.push(Main())
 
-    success.whenComplete(() => print(success.toString()));
+      prefs.setString('user_id', user.id.toString());
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text("username or password wrong"),
+            );
+          });
+    }
   }
 
   void register() {
@@ -92,7 +118,7 @@ class Login extends StatelessWidget {
                       primary: Color(0xFF21E6C1),
                     ),
                     child: Text('Login'),
-                    onPressed: () => {login()},
+                    onPressed: () => {login(context)},
                   ),
                 ),
               ],

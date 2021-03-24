@@ -9,13 +9,13 @@ class Server {
     return db.collection('User');
   }
 
-  Future login(String username, String password) async {
+  Future<User> login(String username, String password) async {
     DbCollection coll = await start();
     var result = await coll.findOne(
         where.eq('username', username).and(where.eq('password', password)));
     if (result != null) {
       return User.fromJson(result);
     }
-    return false;
+    return new User();
   }
 }
