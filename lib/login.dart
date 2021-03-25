@@ -13,7 +13,6 @@ class Login extends StatefulWidget {
 
   @override
   _LoginState createState() => _LoginState();
-
 }
 
 class _LoginState extends State<Login> {
@@ -22,7 +21,7 @@ class _LoginState extends State<Login> {
   Server server = new Server();
 
   final password = TextEditingController();
-  
+
   @override
   void initState() {
     checkLogin(context);
@@ -31,14 +30,11 @@ class _LoginState extends State<Login> {
 
   void login(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    var user_id = prefs.getString('user_id') ?? false;
-
-    //skal flyttes ud her fra!
-    
 
     user = await server.login(username.text, password.text);
     if (user.username != null) {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => new NoteOverview(user: user)));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => new NoteOverview(user: user)));
 
       prefs.setString('user_id', user.id.toHexString());
     } else {
@@ -65,11 +61,12 @@ class _LoginState extends State<Login> {
 
   void checkLogin(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    var user_id = prefs.getString('user_id') ?? false;
+    var userId = prefs.getString('user_id') ?? false;
 
-    if (user_id != false) {
-      user = await server.loginWithId(user_id);
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => new NoteOverview(user: user)));
+    if (userId != false) {
+      user = await server.loginWithId(userId);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => new NoteOverview(user: user)));
       return;
     }
   }
