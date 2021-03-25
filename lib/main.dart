@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:note_flutter_app/Components/add_label.dart';
 import 'package:note_flutter_app/Models/Label.dart';
+import 'package:note_flutter_app/Models/Server.dart';
 import 'package:note_flutter_app/richtexteditor.dart';
 import 'Components/custom_fab.dart';
 import 'Components/custom_label.dart';
+import 'Components/custom_text_field.dart';
 import 'Models/Note.dart';
 import 'Models/User.dart';
 import 'enums/note_type.dart';
@@ -161,7 +163,11 @@ class _NoteOverviewState extends State<NoteOverview> {
                     alignment: Alignment.centerRight,
                     icon: Icon(Icons.delete),
                     color: HexColor.fromHex("#E05263"),
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(context: context, builder: (context){
+                        return removeNoteDialog(note);
+                      });
+                    },
                   ),
                   IconButton(
                       alignment: Alignment.centerRight,
@@ -188,22 +194,46 @@ class _NoteOverviewState extends State<NoteOverview> {
     );
   }
 
-  Widget customTextField(TextEditingController controller){
-    return Container(
-      height: 35,
-      child: TextFormField(
-        controller: controller,
-        style: TextStyle(
-          color: Colors.black
+  // Widget customTextField(TextEditingController controller){
+  //   return Container(
+  //     height: 35,
+  //     child: TextFormField(
+  //       controller: controller,
+  //       style: TextStyle(
+  //         color: Colors.black
+  //       ),
+  //       decoration: InputDecoration(
+  //           hintText: "\"Indkøb\", \"Dansk\"...",
+  //           hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
+  //           isDense: true,
+  //           border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
+  //           filled: true,
+  //           fillColor: Colors.white),
+  //     ),
+  //   );
+  // }
+
+  Widget removeNoteDialog(Note note){
+    return AlertDialog(
+      title: Text('Er du sikker?'),
+      content: Text('${note.title} vil blive slettet for evigt. Denne handling kan IKKE fortrydes.'),
+      actions: [
+        ElevatedButton(
+          child: Text("Annuller"),
+          style: ElevatedButton.styleFrom(primary: Colors.red),
+          onPressed: (){ Navigator.of(context).pop(); }
         ),
-        decoration: InputDecoration(
-            hintText: "\"Indkøb\", \"Dansk\"...",
-            hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
-            isDense: true,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
-            filled: true,
-            fillColor: Colors.white),
-      ),
+        ElevatedButton(
+          child: Text("Bekræft"),
+          style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+          onPressed: (){
+            setState(() {
+              Server().removeNote(note, widget.user.id);            
+            });
+            Navigator.of(context).pop();
+          }
+        )
+      ],
     );
   }
 
@@ -278,7 +308,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                 child: Text("Titel"),
               ),
             ),
-            customTextField(noteNameController),
+            CustomTextField(controller: noteNameController),
             Padding(
               padding: const EdgeInsets.only(bottom: 5, top: 20),
               child: Align(
@@ -348,7 +378,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    customTextField(labelNameController),
+                                    CustomTextField(controller: labelNameController),
                                     GestureDetector(
                                       onTap: (){
                                         showDialog(
@@ -401,7 +431,26 @@ class _NoteOverviewState extends State<NoteOverview> {
                                       child: ElevatedButton(
                                         child: Text("Bekræft"),
                                         style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-                                        onPressed: (){}
+                                        onPressed: (){
+                                          Label label = Label(
+                                            title: labelNameController.text,
+                                            colorHex: currentColor.toHex()
+                                          );
+                                          if (Server().addLabelToUser(label, widget.user.id) != null) {
+                                            setState((){
+                                              labelList.add(CustomLabel(
+                                                label: label,
+                                                onTap: (){
+                                                  setState(() {
+                                                    labelList.remove(label);
+                                                    assignedLabels.add(label);                
+                                                  });
+                                                  print(assignedLabels.length);
+                                                },
+                                              ));
+                                            });
+                                          }
+                                        }
                                       ),
                                     )
                                   ],
@@ -416,16 +465,42 @@ class _NoteOverviewState extends State<NoteOverview> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                child: Text("Bekræft"),
-                style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-                onPressed: (){}
-              ),
-            )
           ],
         ),
+        actions: [
+          ElevatedButton(
+            child: Text("Annuller"),
+            style: ElevatedButton.styleFrom(primary: Colors.red),
+            onPressed: (){
+              if(Server().addNote(Note(
+                title: noteNameController.text,
+                labels: assignedLabels,
+                type: noteType,
+              ), widget.user.id) != null){ Navigator.of(context).pop(); }
+              print(noteNameController.text);
+            }
+          ),
+          ElevatedButton(
+            child: Text("Bekræft"),
+            style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+            onPressed: (){
+              if(Server().addNote(Note(
+                title: noteNameController.text,
+                labels: assignedLabels,
+                type: noteType,
+              ), widget.user.id) != null){
+                // ULRIK DU SKAL NAVIGERE TIL DOKUMENTET DER ER BLEVET OPRETTET HER DIN DEJLIGE TABER
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("Dokument oprettet"),
+                  )
+                );
+              }
+              print(noteNameController.text);
+            }
+          ),
+        ],
       );
     });
   }
