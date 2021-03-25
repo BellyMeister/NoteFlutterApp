@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:note_flutter_app/Components/add_label.dart';
@@ -61,15 +60,10 @@ class NoteOverview extends StatefulWidget {
 
 class _NoteOverviewState extends State<NoteOverview> {
   NoteType noteType;
-  // final String title;
-  // _NoteOverviewState(this.title);
 
   @override
   Widget build(BuildContext context) {
     List<Widget> noteList = [];
-    // for (var i = 0; i < 15; i++) {
-    //   noteList.add(noteCard(Note(labels: randomLabelList(), type: NoteType.values[math.Random().nextInt(NoteType.values.length)], title: "Test dokument $i" )));
-    // }
     for (var note in widget.user.notes) {
       noteList.add(noteCard(note));
     }
@@ -102,18 +96,6 @@ class _NoteOverviewState extends State<NoteOverview> {
         );
       })
     );
-  }
-
-  
-  List<Label> randomLabelList(){  // TODO: DELETE THIS FUNCTION
-    List<Label> testLabels = [];
-    Label newLabel;
-    for (var i = 0; i < math.Random().nextInt(15); i++) {
-      newLabel = Label(title: 'H4 Matematik', colorHex: Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0).toHex());
-      testLabels.add(newLabel);
-    }
-
-    return testLabels;
   }
 
   Widget noteCard(Note note){
@@ -183,10 +165,11 @@ class _NoteOverviewState extends State<NoteOverview> {
     );
   }
 
-  Widget CustomTextField(){
+  Widget customTextField(TextEditingController controller){
     return Container(
       height: 35,
       child: TextFormField(
+        controller: controller,
         style: TextStyle(
           color: Colors.black
         ),
@@ -205,14 +188,59 @@ class _NoteOverviewState extends State<NoteOverview> {
   }
 
   Widget addNoteDialog(){
-    List<Widget> children = [];
+      
+
+    TextEditingController noteNameController = TextEditingController();
+    TextEditingController labelNameController = TextEditingController();
     List<DropdownMenuItem<NoteType>> notelist = NoteType.values.map<DropdownMenuItem<NoteType>>((nt) => DropdownMenuItem(value: nt, child: Text(nt.toString()))).toList();
-    List<Label> labels = randomLabelList();
     Color pickerColor = Theme.of(context).primaryColor;
     Color currentColor = pickerColor;
-
+    List<Label> assignedLabels = [];
+    List<Widget> childrenLabels = [];
+    List<Widget> labelList = [];
 
     return StatefulBuilder(builder: (context, setState) {
+        
+        if(widget.user.userLabels != null){
+          widget.user.userLabels.forEach((ul) {
+            labelList.add(
+              CustomLabel(
+                label: ul,
+                onTap: (){
+                  setState(() {
+                    labelList.remove(ul);
+                    assignedLabels.add(ul);                
+                  });
+                  print(assignedLabels.length);
+                },
+              )
+            );
+          });
+          assignedLabels.forEach((al) {
+            labelList.add(
+              CustomLabel(
+                label: al,
+                onTap: (){
+                  setState(() {
+                    labelList.add(
+                      CustomLabel(
+                        label: al,
+                        onTap: (){
+                          setState(() {
+                            labelList.remove(al);
+                            assignedLabels.add(al);                    
+                          });
+                        },
+                      )
+                    );            
+                    assignedLabels.remove(al);
+                  });
+                  print("HEJ");
+                },
+              )
+            );
+          });
+        }
       return AlertDialog(
         scrollable: true,
         backgroundColor: Theme.of(context).backgroundColor,
@@ -227,7 +255,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                 child: Text("Titel"),
               ),
             ),
-            CustomTextField(),
+            customTextField(noteNameController),
             Padding(
               padding: const EdgeInsets.only(bottom: 5, top: 20),
               child: Align(
@@ -256,7 +284,9 @@ class _NoteOverviewState extends State<NoteOverview> {
               alignment: Alignment.centerLeft,
               child: Wrap(
                 alignment: WrapAlignment.start,
-                  children: children.isEmpty ? [Text('Ingen labels tilføjet')] : children,
+                  children: childrenLabels.isEmpty 
+                    ? [Text('Ingen labels tilføjet', style: TextStyle(fontSize: 12))] 
+                    : childrenLabels
               ),
             ),
             Padding(
@@ -277,7 +307,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                       width: 150,
                       height: 200,
                       child: ListView(
-                        children: labels.map((e) => CustomLabel(label: e)).toList(),
+                        children: labelList,
                       ),
                     ),
                     Expanded(
@@ -294,7 +324,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    CustomTextField(),
+                                    customTextField(labelNameController),
                                     GestureDetector(
                                       onTap: (){
                                         showDialog(
@@ -341,20 +371,35 @@ class _NoteOverviewState extends State<NoteOverview> {
                                         width: 100,
                                         height: 50,
                                       ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ElevatedButton(
+                                        child: Text("Bekræft"),
+                                        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+                                        onPressed: (){}
+                                      ),
                                     )
                                   ],
                                 ),
                               );
                             }
                           );
-                          
                         },
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                child: Text("Bekræft"),
+                style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+                onPressed: (){}
+              ),
+            )
           ],
         ),
       );
