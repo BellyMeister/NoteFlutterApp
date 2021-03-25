@@ -34,7 +34,6 @@ class _CheckListViewState extends State<CheckListView> {
         // padding: const EdgeInsets.all(8),
         itemCount: widget.note.entries.length,
         itemBuilder: (BuildContext context, int index) {
-          bool checkboxValue = false;
           return CheckboxListTile(
             value: widget.note.entries[index].done,
             title: Text(widget.note.entries[index].title),
