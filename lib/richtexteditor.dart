@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note_flutter_app/Models/Note.dart';
+import 'package:note_flutter_app/Models/Server.dart';
 
 import 'Models/User.dart';
 
@@ -13,6 +14,7 @@ class RichTextEditor extends StatefulWidget {
 
 class _RichTextEditorState extends State<RichTextEditor> {
   void onBackPressed() {
+    Server().saveUserData(widget.user);
     print(widget.note.bodyText);
   }
 

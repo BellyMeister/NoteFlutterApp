@@ -11,14 +11,13 @@ class User {
   List<Note> notes;
   List<Label> userLabels;
 
-  User({
-    this.id,
-    this.name,
-    this.username,
-    this.password,
-    this.notes,
-    this.userLabels
-  });
+  User(
+      {this.id,
+      this.name,
+      this.username,
+      this.password,
+      this.notes,
+      this.userLabels});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['_id'] != null ? json['_id'] : "";
@@ -30,6 +29,8 @@ class User {
       json['notes'].forEach((v) {
         notes.add(new Note.fromJson(v));
       });
+    }
+    if (json['userLabels'] != null) {
       userLabels = <Label>[];
       json['userLabels'].forEach((v) {
         userLabels.add(new Label.fromJson(v));

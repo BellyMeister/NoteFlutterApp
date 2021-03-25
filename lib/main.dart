@@ -68,12 +68,7 @@ class _NoteOverviewState extends State<NoteOverview> {
   NoteType noteType;
   // final String title;
   // _NoteOverviewState(this.title);
-  void initState() {
-    Server server = Server();
-    server.saveUserData(widget.user);
-    super.initState();
-  }
-
+  List<Widget> noteList = [];
   void openRitchTextEdit(context, note) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
@@ -96,7 +91,7 @@ class _NoteOverviewState extends State<NoteOverview> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> noteList = [];
+    // noteList = [];
     for (var note in widget.user.notes) {
       noteList.add(noteCard(note));
     }
@@ -217,9 +212,11 @@ class _NoteOverviewState extends State<NoteOverview> {
                     icon: Icon(Icons.delete),
                     color: HexColor.fromHex("#E05263"),
                     onPressed: () {
-                      showDialog(context: context, builder: (context){
-                        return removeNoteDialog(note);
-                      });
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return removeNoteDialog(note);
+                          });
                     },
                   ),
                   IconButton(
@@ -247,26 +244,29 @@ class _NoteOverviewState extends State<NoteOverview> {
     );
   }
 
-  Widget removeNoteDialog(Note note){
+  Widget removeNoteDialog(Note note) {
     return AlertDialog(
       title: Text('Er du sikker?'),
-      content: Text('${note.title} vil blive slettet for evigt. Denne handling kan IKKE fortrydes.'),
+      backgroundColor: Theme.of(context).backgroundColor,
+      content: Text(
+          '${note.title} vil blive slettet for evigt. Denne handling kan IKKE fortrydes.'),
       actions: [
         ElevatedButton(
-          child: Text("Annuller"),
-          style: ElevatedButton.styleFrom(primary: Colors.red),
-          onPressed: (){ Navigator.of(context).pop(); }
-        ),
+            child: Text("Annuller"),
+            style: ElevatedButton.styleFrom(primary: Colors.red),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
         ElevatedButton(
-          child: Text("Bekræft"),
-          style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-          onPressed: (){
-            setState(() {
-              Server().removeNote(note, widget.user.id);            
-            });
-            Navigator.of(context).pop();
-          }
-        )
+            child: Text("Bekræft"),
+            style: ElevatedButton.styleFrom(
+                primary: Theme.of(context).primaryColor),
+            onPressed: () {
+              setState(() {
+                Server().removeNote(note, widget.user.id);
+              });
+              Navigator.of(context).pop();
+            })
       ],
     );
   }
@@ -400,102 +400,112 @@ class _NoteOverviewState extends State<NoteOverview> {
                             primary: Theme.of(context).primaryColor),
                         onPressed: () {
                           showDialog(
-                            context: context, 
-                            builder: (context){
-                              return AlertDialog(
-                                backgroundColor: Theme.of(context).backgroundColor,
-                                title: Text('Ny label'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    CustomTextField(controller: labelNameController),
-                                    GestureDetector(
-                                      onTap: (){
-                                        showDialog(
-                                          context: context,
-                                          builder: (context){
-                                            return AlertDialog(
-                                              backgroundColor: Theme.of(context).backgroundColor,
-                                              content: SingleChildScrollView(
-                                                child: BlockPicker(
-                                                  pickerColor: pickerColor,
-                                                  onColorChanged: (newColor){
-                                                    pickerColor = newColor;
-                                                  },
-                                                ),
-                                              ),
-                                              actions: [
-                                                ElevatedButton(
-                                                  child: Text("Anuller"),
-                                                  style: ElevatedButton.styleFrom(primary: Colors.red),
-                                                  onPressed: (){
-                                                    setState((){
-                                                      pickerColor = currentColor;
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  backgroundColor:
+                                      Theme.of(context).backgroundColor,
+                                  title: Text('Ny label'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomTextField(
+                                          controller: labelNameController),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .backgroundColor,
+                                                  content:
+                                                      SingleChildScrollView(
+                                                    child: BlockPicker(
+                                                      pickerColor: pickerColor,
+                                                      onColorChanged:
+                                                          (newColor) {
+                                                        pickerColor = newColor;
+                                                      },
+                                                    ),
+                                                  ),
+                                                  actions: [
+                                                    ElevatedButton(
+                                                      child: Text("Anuller"),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              primary:
+                                                                  Colors.red),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          pickerColor =
+                                                              currentColor;
+                                                        });
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                    ElevatedButton(
+                                                      child: Text("Bekræft1"),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                              primary: Theme.of(
+                                                                      context)
+                                                                  .primaryColor),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          currentColor =
+                                                              pickerColor;
+                                                        });
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              });
+                                        },
+                                        child: Container(
+                                          color: currentColor,
+                                          width: 100,
+                                          height: 50,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ElevatedButton(
+                                            child: Text("Bekræft2"),
+                                            style: ElevatedButton.styleFrom(
+                                                primary: Theme.of(context)
+                                                    .primaryColor),
+                                            onPressed: () {
+                                              Label label = Label(
+                                                  title:
+                                                      labelNameController.text,
+                                                  colorHex:
+                                                      currentColor.toHex());
+
+                                              widget.user.userLabels.add(label);
+                                              setState(() {
+                                                labelList.add(CustomLabel(
+                                                  label: label,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      labelList.remove(label);
+                                                      assignedLabels.add(label);
                                                     });
-                                                    Navigator.of(context).pop();
+                                                    print(
+                                                        assignedLabels.length);
                                                   },
-                                                ),
-                                                ElevatedButton(
-                                                  child: Text("Bekræft"),
-                                                  style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-                                                  onPressed: (){
-                                                    setState((){
-                                                      currentColor = pickerColor;
-                                                    });
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                        );
-                                      },
-                                      child: Container(
-                                        color: currentColor,
-                                        width: 100,
-                                        height: 50,
+                                                ));
+                                              });
+                                            }),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ElevatedButton(
-                                        child: Text("Bekræft"),
-                                        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-                                        onPressed: (){
-                                          Label label = Label(
-                                            title: labelNameController.text,
-                                            colorHex: currentColor.toHex()
-                                          );
-                                          if (Server().addLabelToUser(label, widget.user.id) != null) {
-                                            setState((){
-                                              labelList.add(CustomLabel(
-                                                label: label,
-                                                onTap: (){
-                                                  setState(() {
-                                                    labelList.remove(label);
-                                                    assignedLabels.add(label);                
-                                                  });
-                                                  print(assignedLabels.length);
-                                                },
-                                              ));
-                                            });
-                                          }
-                                        }
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ElevatedButton(
-                                        child: Text("Bekræft"),
-                                        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-                                        onPressed: () {}
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }
-                          );
+                                    ],
+                                  ),
+                                );
+                              });
                         },
                       ),
                     ),
@@ -506,7 +516,7 @@ class _NoteOverviewState extends State<NoteOverview> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                  child: Text("Bekræft"),
+                  child: Text("Bekræft3"),
                   style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor),
                   onPressed: () {}),
@@ -515,37 +525,42 @@ class _NoteOverviewState extends State<NoteOverview> {
         ),
         actions: [
           ElevatedButton(
-            child: Text("Annuller"),
-            style: ElevatedButton.styleFrom(primary: Colors.red),
-            onPressed: (){
-              if(Server().addNote(Note(
-                title: noteNameController.text,
-                labels: assignedLabels,
-                type: noteType,
-              ), widget.user.id) != null){ Navigator.of(context).pop(); }
-              print(noteNameController.text);
-            }
-          ),
+              child: Text("Annuller"),
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+              onPressed: () {
+                if (Server().addNote(
+                        Note(
+                          title: noteNameController.text,
+                          labels: assignedLabels,
+                          type: noteType,
+                        ),
+                        widget.user.id) !=
+                    null) {
+                  Navigator.of(context).pop();
+                }
+                print(noteNameController.text);
+              }),
           ElevatedButton(
-            child: Text("Bekræft"),
-            style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
-            onPressed: (){
-              if(Server().addNote(Note(
-                title: noteNameController.text,
-                labels: assignedLabels,
-                type: noteType,
-              ), widget.user.id) != null){
-                // ULRIK DU SKAL NAVIGERE TIL DOKUMENTET DER ER BLEVET OPRETTET HER DIN DEJLIGE TABER
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Dokument oprettet"),
-                  )
+              child: Text("Bekræft5"),
+              style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor),
+              onPressed: () {
+                Note tempNote = Note(
+                  title: noteNameController.text,
+                  labels: assignedLabels,
+                  type: noteType,
                 );
-              }
-              print(noteNameController.text);
-            }
-          ),
+                setState(() {
+                  noteList.add(noteCard(tempNote));
+                });
+                widget.user.notes.add(tempNote);
+                // TODO ULRIK DU SKAL NAVIGERE TIL DOKUMENTET DER ER BLEVET OPRETTET HER DIN DEJLIGE TABER
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("Dokument oprettet"),
+                ));
+                print(noteNameController.text);
+              }),
         ],
       );
     });

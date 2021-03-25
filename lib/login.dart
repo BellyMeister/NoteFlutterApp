@@ -1,6 +1,7 @@
 import 'package:note_flutter_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Models/Label.dart';
 import 'Models/Note.dart';
 import 'Models/Server.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +57,7 @@ class _LoginState extends State<Login> {
     user.password = password.text;
 
     user.notes = <Note>[];
+    user.userLabels = <Label>[];
     server.registerNewUser(user);
   }
 
