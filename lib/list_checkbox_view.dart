@@ -102,9 +102,4 @@ class _CheckListViewState extends State<CheckListView> {
       }),
     );
   }
-  void changeValue(bool value, int index){
-    setState(() {
-      widget.note.entries[index].done = value;
-    });
-  }
 }
