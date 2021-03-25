@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:note_flutter_app/Models/Note.dart';
+
+import 'Models/User.dart';
 
 class RichTextEditor extends StatefulWidget {
+  final User user;
+
+  const RichTextEditor({Key key, this.user}) : super(key: key);
   @override
   _RichTextEditorState createState() => _RichTextEditorState();
 }
@@ -8,6 +14,11 @@ class RichTextEditor extends StatefulWidget {
 class _RichTextEditorState extends State<RichTextEditor> {
   void saveText(text) {
     // her skal auto save være
+    User user = User();
+    Note newnote = Note();
+
+    newnote.bodyText = text;
+
     print("First text field: $text");
   }
 
