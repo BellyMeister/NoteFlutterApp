@@ -32,18 +32,24 @@ class _CheckListViewState extends State<CheckListView> {
         shadowColor: Colors.transparent,
       ),
       body: ListView.builder(
-        // padding: const EdgeInsets.all(8),
         itemCount: widget.note.entries.length,
         itemBuilder: (BuildContext context, int index) {
-          return CheckboxListTile(
-            value: widget.note.entries[index].done,
-            title: Text(widget.note.entries[index].title),
-            onChanged: (bool value){
-              setState(() {
-                widget.note.entries[index].done = value;
-              });
-            },
-            controlAffinity: ListTileControlAffinity.leading,
+          return Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: Theme.of(context).backgroundColor),
+              )
+            ),
+            child: CheckboxListTile(
+              value: widget.note.entries[index].done,
+              title: Text(widget.note.entries[index].title),
+              onChanged: (bool value){
+                setState(() {
+                  widget.note.entries[index].done = value;
+                });
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
           );
         },
       ),
@@ -72,6 +78,7 @@ class _CheckListViewState extends State<CheckListView> {
                 child: Text("Anuller"),
                 style: ElevatedButton.styleFrom(primary: Colors.red),
                 onPressed: (){
+                  controller.text = '';                
                   Navigator.of(context).pop();
                 },
               ),
@@ -83,7 +90,8 @@ class _CheckListViewState extends State<CheckListView> {
                     widget.note.entries.add(Entry(
                       done: false,
                       title: controller.text
-                    ));                
+                    ));
+                    controller.text = '';                
                   });
                   Navigator.of(context).pop();
                 },
