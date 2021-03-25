@@ -42,8 +42,13 @@ class Server {
 
   Future<bool> addNote(Note note, ObjectId id) async {
     DbCollection coll = await start();
-    coll.update(where.eq('_id', id), modify.push("notes", note.toJson()));
-    return true;
+    var result = await coll.update(
+        where.eq('_id', id), modify.push("notes", note.toJson()));
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<bool> saveUserData(User user) async {
