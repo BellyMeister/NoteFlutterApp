@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'Models/Note.dart';
 import 'Models/User.dart';
 
 class CheckListView extends StatefulWidget {
   final User user;
-
-  const CheckListView({Key key, this.user}) : super(key: key);
+  final Note note;
+  const CheckListView({Key key, this.user, this.note}) : super(key: key);
   @override
   _CheckListViewState createState() => _CheckListViewState();
 }
