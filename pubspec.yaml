@@ -38,6 +38,8 @@ dependencies:
 
   equatable: ^2.0.0
 
+  enum_to_string: ^2.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

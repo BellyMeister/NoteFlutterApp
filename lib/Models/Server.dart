@@ -1,4 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
+import 'Label.dart';
 import 'Note.dart';
 import 'User.dart';
 
@@ -42,8 +43,24 @@ class Server {
 
   Future<bool> addNote(Note note, ObjectId id) async {
     DbCollection coll = await start();
-    coll.update(where.eq('_id', id), modify.push("notes", note.toJson()));
-    return true;
+    var result = await coll.update(
+        where.eq('_id', id), modify.push("notes", note.toJson()));
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> removeNote(Note note, ObjectId id) async {
+    DbCollection coll = await start();
+    var result = await coll.update(
+        where.eq('_id', id), modify.pull("notes", note.toJson()));
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<bool> saveUserData(User user) async {

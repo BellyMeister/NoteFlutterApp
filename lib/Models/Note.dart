@@ -1,3 +1,4 @@
+import 'package:enum_to_string/enum_to_string.dart';
 import 'package:note_flutter_app/Models/sticky_note.dart';
 import 'package:note_flutter_app/enums/note_type.dart';
 import 'Entry.dart';
@@ -21,8 +22,7 @@ class Note {
 
   Note.fromJson(Map<String, dynamic> json) {
     title = json['title'];
-    type = NoteType.values
-        .firstWhere((e) => e.toString() == 'NoteType.' + json['type']);
+    type = EnumToString.fromString(NoteType.values, json['type']);
     bodyText = json['bodyText'];
     if (json['labels'] != null) {
       labels = <Label>[];
@@ -47,7 +47,7 @@ class Note {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['title'] = this.title;
-    data['type'] = this.type.toString();
+    data['type'] = EnumToString.convertToString(this.type);
     data['bodyText'] = this.bodyText;
     if (this.labels != null) {
       data['labels'] = this.labels.map((v) => v.toJson()).toList();
