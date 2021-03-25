@@ -23,7 +23,7 @@ class _CheckListViewState extends State<CheckListView> {
       backgroundColor: const Color(0xFF1D416F),
       appBar: AppBar(
         title: Text(
-          "placeholdername",
+          widget.note.title,
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Theme.of(context).backgroundColor,
