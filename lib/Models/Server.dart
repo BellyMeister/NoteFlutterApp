@@ -29,7 +29,29 @@ class Server {
     return new User();
   }
 
-  Future addNote(ObjectId id, Note note) async {
+  Future<User> registerNewUser(User user) async {
     DbCollection coll = await start();
+    await coll.insertOne(user.toJson());
+    var newUser = await coll.findOne();
+    if (newUser != null) {
+      return User.fromJson(newUser);
+    }
+    return new User();
+  }
+
+  Future<bool> addNote(Note note, ObjectId id) async {
+    DbCollection coll = await start();
+    coll.update(where.eq('_id', id), modify.push("notes", note.toJson()));
+    return true;
+  }
+
+  Future<bool> saveUserData(User user) async {
+    DbCollection coll = await start();
+    var result = await coll.update(where.eq('_id', user.id), user.toJson());
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
