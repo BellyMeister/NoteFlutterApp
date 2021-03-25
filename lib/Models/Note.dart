@@ -1,4 +1,3 @@
-import 'package:mongo_dart/mongo_dart.dart';
 import 'package:note_flutter_app/Models/sticky_note.dart';
 import 'package:note_flutter_app/enums/note_type.dart';
 import 'Entry.dart';
