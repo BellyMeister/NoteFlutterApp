@@ -72,4 +72,15 @@ class Server {
       return false;
     }
   }
+
+  Future<bool> addLabelToUser(Label label, ObjectId id) async {
+    DbCollection coll = await start();
+    var result = await coll.update(
+        where.eq('_id', id), modify.push("userLabels", label.toJson()));
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
