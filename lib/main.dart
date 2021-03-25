@@ -6,6 +6,7 @@ import 'package:note_flutter_app/Models/Label.dart';
 import 'Components/custom_fab.dart';
 import 'Components/custom_label.dart';
 import 'Models/Note.dart';
+import 'Models/User.dart';
 import 'enums/note_type.dart';
 import 'package:note_flutter_app/login.dart';
 import 'extensions.dart';
@@ -49,22 +50,28 @@ class Main extends StatelessWidget {
 }
 
 class NoteOverview extends StatefulWidget {
-  NoteOverview({Key key, this.title}) : super(key: key);
-  final String title;
+  final User user;
 
-  NoteType noteType;
+
+  const NoteOverview({Key key, this.user}) : super(key: key);
 
   @override
   _NoteOverviewState createState() => _NoteOverviewState();
 }
 
 class _NoteOverviewState extends State<NoteOverview> {
+  NoteType noteType;
+  // final String title;
+  // _NoteOverviewState(this.title);
 
   @override
   Widget build(BuildContext context) {
     List<Widget> noteList = [];
-    for (var i = 0; i < 15; i++) {
-      noteList.add(noteCard(Note(labels: randomLabelList(), type: NoteType.values[math.Random().nextInt(NoteType.values.length)], title: "Test dokument $i" )));
+    // for (var i = 0; i < 15; i++) {
+    //   noteList.add(noteCard(Note(labels: randomLabelList(), type: NoteType.values[math.Random().nextInt(NoteType.values.length)], title: "Test dokument $i" )));
+    // }
+    for (var note in widget.user.notes) {
+      noteList.add(noteCard(note));
     }
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -89,7 +96,7 @@ class _NoteOverviewState extends State<NoteOverview> {
         return showDialog(
           context: context, 
           builder: (context){
-            widget.noteType = NoteType.textDocument;
+            noteType = NoteType.textDocument;
             return addNoteDialog();
           }
         );
@@ -232,10 +239,10 @@ class _NoteOverviewState extends State<NoteOverview> {
               dropdownMenyItemList: notelist,
               onChanged: (newValue){
                 setState((){
-                  widget.noteType = newValue;
+                  noteType = newValue;
                 });
               },
-              value: widget.noteType,
+              value: noteType,
               isEnabled: true,
             ),
             Padding(
@@ -269,15 +276,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                     Container(
                       width: 150,
                       height: 200,
-                      // child: ListView.builder(
-                      //   shrinkWrap: true,
-                      //   itemCount: labels.length,
-                      //   itemBuilder: (BuildContext context, int index){
-                      //     return CustomLabel(label: labels[index]);
-                      //   },
-                      // ),
                       child: ListView(
-                        // mainAxisSize: MainAxisSize.min,
                         children: labels.map((e) => CustomLabel(label: e)).toList(),
                       ),
                     ),

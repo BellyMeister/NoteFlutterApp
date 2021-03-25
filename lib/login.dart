@@ -1,3 +1,4 @@
+import 'package:note_flutter_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Models/Note.dart';
@@ -12,29 +13,32 @@ class Login extends StatefulWidget {
 
   @override
   _LoginState createState() => _LoginState();
+
 }
 
 class _LoginState extends State<Login> {
   final username = TextEditingController();
+  User user = new User();
+  Server server = new Server();
 
   final password = TextEditingController();
+  
+  @override
+  void initState() {
+    checkLogin(context);
+    super.initState();
+  }
 
   void login(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     var user_id = prefs.getString('user_id') ?? false;
-    Server server = new Server();
-    User user = new User();
 
     //skal flyttes ud her fra!
-    if (user_id != false) {
-      user = await server.loginWithId(user_id);
-      // vidre til seppis side!
-      return;
-    }
+    
 
     user = await server.login(username.text, password.text);
     if (user.username != null) {
-      // Navigator.push(Main())
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => new NoteOverview(user: user)));
 
       prefs.setString('user_id', user.id.toHexString());
     } else {
@@ -57,6 +61,17 @@ class _LoginState extends State<Login> {
 
     user.notes = <Note>[];
     server.registerNewUser(user);
+  }
+
+  void checkLogin(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    var user_id = prefs.getString('user_id') ?? false;
+
+    if (user_id != false) {
+      user = await server.loginWithId(user_id);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => new NoteOverview(user: user)));
+      return;
+    }
   }
 
   @override
