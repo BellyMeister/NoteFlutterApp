@@ -19,6 +19,7 @@ class _CheckListViewState extends State<CheckListView> {
 
   @override
   Widget build(BuildContext context) {
+    if(widget.note.entries == null) widget.note.entries = [];
     return Scaffold(
       backgroundColor: const Color(0xFF1D416F),
       appBar: AppBar(
