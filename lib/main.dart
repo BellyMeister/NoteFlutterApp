@@ -4,6 +4,7 @@ import 'package:note_flutter_app/Components/add_label.dart';
 import 'package:note_flutter_app/Models/Label.dart';
 import 'package:note_flutter_app/Models/Server.dart';
 import 'package:note_flutter_app/richtexteditor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/custom_fab.dart';
 import 'Components/custom_label.dart';
 import 'Components/custom_text_field.dart';
@@ -66,14 +67,24 @@ class _NoteOverviewState extends State<NoteOverview> {
   NoteType noteType;
   // final String title;
   // _NoteOverviewState(this.title);
-  void openRitchTextEdit(context) {
+  void openRitchTextEdit(context, note) {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => new RichTextEditor(user: widget.user)));
+        builder: (context) =>
+            new RichTextEditor(user: widget.user, note: note)));
   }
 
-  void openTextEditor(context) {
+  void openTextEditor(context, note) {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => new CheckListView(user: widget.user)));
+        builder: (context) =>
+            new CheckListView(user: widget.user, note: note)));
+  }
+
+  logout(context) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove("user_id");
+    Navigator.pop(context);
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (context) => new Login()));
   }
 
   @override
@@ -86,6 +97,41 @@ class _NoteOverviewState extends State<NoteOverview> {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
+          actions: [
+            IconButton(
+              alignment: Alignment.centerRight,
+              icon: Icon(Icons.settings),
+              color: HexColor.fromHex("#E05263"),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Center(
+                        child: AlertDialog(
+                          content: Container(
+                            width: 48.0,
+                            height: 100.0,
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Text("Want to logout?"),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFF21E6C1),
+                                  ),
+                                  child: Text('logout'),
+                                  onPressed: () => {logout(context)},
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+              },
+            ),
+          ],
           title: Text(
             "Oversigt",
             style: TextStyle(color: Colors.white),
@@ -176,11 +222,11 @@ class _NoteOverviewState extends State<NoteOverview> {
                       onPressed: () {
                         switch (note.type) {
                           case NoteType.textDocument:
-                            openRitchTextEdit(context);
+                            openRitchTextEdit(context, note);
                             break;
 
                           case NoteType.checklist:
-                            openTextEditor(context);
+                            openTextEditor(context, note);
                             break;
                           default:
                         }
@@ -193,25 +239,6 @@ class _NoteOverviewState extends State<NoteOverview> {
       ),
     );
   }
-
-  // Widget customTextField(TextEditingController controller){
-  //   return Container(
-  //     height: 35,
-  //     child: TextFormField(
-  //       controller: controller,
-  //       style: TextStyle(
-  //         color: Colors.black
-  //       ),
-  //       decoration: InputDecoration(
-  //           hintText: "\"Indkøb\", \"Dansk\"...",
-  //           hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
-  //           isDense: true,
-  //           border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
-  //           filled: true,
-  //           fillColor: Colors.white),
-  //     ),
-  //   );
-  // }
 
   Widget removeNoteDialog(Note note){
     return AlertDialog(
@@ -237,12 +264,13 @@ class _NoteOverviewState extends State<NoteOverview> {
     );
   }
 
-  Widget addNoteDialog(){
-      
-
+  Widget addNoteDialog() {
     TextEditingController noteNameController = TextEditingController();
     TextEditingController labelNameController = TextEditingController();
-    List<DropdownMenuItem<NoteType>> notelist = NoteType.values.map<DropdownMenuItem<NoteType>>((nt) => DropdownMenuItem(value: nt, child: Text(nt.toString()))).toList();
+    List<DropdownMenuItem<NoteType>> notelist = NoteType.values
+        .map<DropdownMenuItem<NoteType>>(
+            (nt) => DropdownMenuItem(value: nt, child: Text(nt.toString())))
+        .toList();
     Color pickerColor = Theme.of(context).primaryColor;
     Color currentColor = pickerColor;
     List<Label> assignedLabels = [];
@@ -250,47 +278,40 @@ class _NoteOverviewState extends State<NoteOverview> {
     List<Widget> labelList = [];
 
     return StatefulBuilder(builder: (context, setState) {
-        
-        if(widget.user.userLabels != null){
-          widget.user.userLabels.forEach((ul) {
-            labelList.add(
-              CustomLabel(
-                label: ul,
-                onTap: (){
-                  setState(() {
-                    labelList.remove(ul);
-                    assignedLabels.add(ul);                
-                  });
-                  print(assignedLabels.length);
-                },
-              )
-            );
-          });
-          assignedLabels.forEach((al) {
-            labelList.add(
-              CustomLabel(
-                label: al,
-                onTap: (){
-                  setState(() {
-                    labelList.add(
-                      CustomLabel(
-                        label: al,
-                        onTap: (){
-                          setState(() {
-                            labelList.remove(al);
-                            assignedLabels.add(al);                    
-                          });
-                        },
-                      )
-                    );            
-                    assignedLabels.remove(al);
-                  });
-                  print("HEJ");
-                },
-              )
-            );
-          });
-        }
+      if (widget.user.userLabels != null) {
+        widget.user.userLabels.forEach((ul) {
+          labelList.add(CustomLabel(
+            label: ul,
+            onTap: () {
+              setState(() {
+                labelList.remove(ul);
+                assignedLabels.add(ul);
+              });
+              print(assignedLabels.length);
+            },
+          ));
+        });
+        assignedLabels.forEach((al) {
+          labelList.add(CustomLabel(
+            label: al,
+            onTap: () {
+              setState(() {
+                labelList.add(CustomLabel(
+                  label: al,
+                  onTap: () {
+                    setState(() {
+                      labelList.remove(al);
+                      assignedLabels.add(al);
+                    });
+                  },
+                ));
+                assignedLabels.remove(al);
+              });
+              print("HEJ");
+            },
+          ));
+        });
+      }
       return AlertDialog(
         scrollable: true,
         backgroundColor: Theme.of(context).backgroundColor,
@@ -336,11 +357,13 @@ class _NoteOverviewState extends State<NoteOverview> {
             Align(
               alignment: Alignment.centerLeft,
               child: Wrap(
-                alignment: WrapAlignment.start,
-                  children: childrenLabels.isEmpty 
-                    ? [Text('Ingen labels tilføjet', style: TextStyle(fontSize: 12))] 
-                    : childrenLabels
-              ),
+                  alignment: WrapAlignment.start,
+                  children: childrenLabels.isEmpty
+                      ? [
+                          Text('Ingen labels tilføjet',
+                              style: TextStyle(fontSize: 12))
+                        ]
+                      : childrenLabels),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 5, top: 20),
@@ -452,6 +475,14 @@ class _NoteOverviewState extends State<NoteOverview> {
                                           }
                                         }
                                       ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ElevatedButton(
+                                        child: Text("Bekræft"),
+                                        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+                                        onPressed: () {}
+                                      ),
                                     )
                                   ],
                                 ),
@@ -465,6 +496,14 @@ class _NoteOverviewState extends State<NoteOverview> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                  child: Text("Bekræft"),
+                  style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor),
+                  onPressed: () {}),
+            )
           ],
         ),
         actions: [

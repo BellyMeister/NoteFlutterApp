@@ -52,6 +52,22 @@ class Server {
     }
   }
 
+  Future<bool> updateNote(Note note, ObjectId id) async {
+    DbCollection coll = await start();
+    var result = await coll.update({
+      "_id": id,
+      "notes.title": note.title
+    }, {
+      "\$set": {"notes.\$": note.toJson()},
+    });
+
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   Future<bool> removeNote(Note note, ObjectId id) async {
     DbCollection coll = await start();
     var result = await coll.update(
@@ -77,6 +93,22 @@ class Server {
     DbCollection coll = await start();
     var result = await coll.update(
         where.eq('_id', id), modify.push("userLabels", label.toJson()));
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> addLabelToNote(String noteName, Label label, ObjectId id) async {
+    DbCollection coll = await start();
+    var result = await coll.update({
+      "_id": id,
+      "notes.title": noteName
+    }, {
+      "\$push": {"notes.\$.labels": label.toJson()},
+    });
+
     if (result['updatedExisting'] == true) {
       return true;
     } else {
