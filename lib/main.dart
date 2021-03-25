@@ -95,48 +95,44 @@ class _NoteOverviewState extends State<NoteOverview> {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
-          title: Row(
-            children: [
-              Center(
-                child: Text(
-                  "Oversigt",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              IconButton(
-                alignment: Alignment.centerRight,
-                icon: Icon(Icons.settings),
-                color: HexColor.fromHex("#E05263"),
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Center(
-                          child: AlertDialog(
-                            content: Container(
-                              width: 48.0,
-                              height: 100.0,
-                              child: Column(
-                                children: [
-                                  Center(
-                                    child: Text("Want to logout?"),
+          actions: [
+            IconButton(
+              alignment: Alignment.centerRight,
+              icon: Icon(Icons.settings),
+              color: HexColor.fromHex("#E05263"),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Center(
+                        child: AlertDialog(
+                          content: Container(
+                            width: 48.0,
+                            height: 100.0,
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Text("Want to logout?"),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Color(0xFF21E6C1),
                                   ),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Color(0xFF21E6C1),
-                                    ),
-                                    child: Text('logout'),
-                                    onPressed: () => {logout(context)},
-                                  ),
-                                ],
-                              ),
+                                  child: Text('logout'),
+                                  onPressed: () => {logout(context)},
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      });
-                },
-              ),
-            ],
+                        ),
+                      );
+                    });
+              },
+            ),
+          ],
+          title: Text(
+            "Oversigt",
+            style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Theme.of(context).backgroundColor,
           centerTitle: true,
