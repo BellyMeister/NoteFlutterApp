@@ -99,4 +99,20 @@ class Server {
       return false;
     }
   }
+
+  Future<bool> addLabelToNote(String noteName, Label label, ObjectId id) async {
+    DbCollection coll = await start();
+    var result = await coll.update({
+      "_id": id,
+      "notes.title": noteName
+    }, {
+      "\$push": {"notes.\$.labels": label.toJson()},
+    });
+
+    if (result['updatedExisting'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
