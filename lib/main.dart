@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/custom_fab.dart';
 import 'Components/custom_label.dart';
 import 'Models/Note.dart';
+import 'Models/Server.dart';
 import 'Models/User.dart';
 import 'enums/note_type.dart';
 import 'package:note_flutter_app/login.dart';
@@ -65,6 +66,12 @@ class _NoteOverviewState extends State<NoteOverview> {
   NoteType noteType;
   // final String title;
   // _NoteOverviewState(this.title);
+  void initState() {
+    Server server = Server();
+    server.saveUserData(widget.user);
+    super.initState();
+  }
+
   void openRitchTextEdit(context, note) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
