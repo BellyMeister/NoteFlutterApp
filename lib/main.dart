@@ -1,12 +1,21 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:note_flutter_app/Components/add_label.dart';
+import 'package:note_flutter_app/Models/Label.dart';
+import 'Components/custom_fab.dart';
+import 'Components/custom_label.dart';
+import 'Models/Note.dart';
+import 'enums/note_type.dart';
 import 'package:note_flutter_app/login.dart';
 import 'extensions.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(Main());
 }
 
-class MyApp extends StatelessWidget {
+class Main extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -39,87 +48,317 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+class NoteOverview extends StatefulWidget {
+  NoteOverview({Key key, this.title}) : super(key: key);
   final String title;
 
+  NoteType noteType;
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _NoteOverviewState createState() => _NoteOverviewState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class _NoteOverviewState extends State<NoteOverview> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    List<Widget> noteList = [];
+    for (var i = 0; i < 15; i++) {
+      noteList.add(noteCard(Note(labels: randomLabelList(), type: NoteType.values[math.Random().nextInt(NoteType.values.length)], title: "Test dokument $i" )));
+    }
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("Oversigt", style: TextStyle(color: Colors.white),),
+        backgroundColor: Theme.of(context).backgroundColor,
+        centerTitle: true,
+        shadowColor: Colors.transparent,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: noteList,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+          ),
+        ]
+      ),
+      floatingActionButton: CustomFloatingActionButton(callback: () 
+      {
+        return showDialog(
+          context: context, 
+          builder: (context){
+            widget.noteType = NoteType.textDocument;
+            return addNoteDialog();
+          }
+        );
+      })
+    );
+  }
+
+  
+  List<Label> randomLabelList(){  // TODO: DELETE THIS FUNCTION
+    List<Label> testLabels = [];
+    Label newLabel;
+    for (var i = 0; i < math.Random().nextInt(15); i++) {
+      newLabel = Label(title: 'H4 Matematik', colorHex: Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0).toHex());
+      testLabels.add(newLabel);
+    }
+
+    return testLabels;
+  }
+
+  Widget noteCard(Note note){
+    Icon icon;
+    switch (note.type) {
+      case NoteType.textDocument:
+        icon = Icon(Icons.description, color: Theme.of(context).backgroundColor, size: 40);
+        break;
+      case NoteType.list:
+        icon = Icon(Icons.list_alt_outlined, color: Theme.of(context).backgroundColor, size: 40);
+        break;
+      case NoteType.checklist:
+        icon = Icon(Icons.check_box, color: Theme.of(context).backgroundColor, size: 40);
+        break;
+      case NoteType.stickyNote:
+        icon = Icon(Icons.sticky_note_2, color: Theme.of(context).backgroundColor, size: 40);
+        break;
+      default:
+        icon = Icon(Icons.error, color: Colors.red);
+    }
+
+    List<CustomLabel> customLabels = [];
+    for (var label in note.labels) {
+      customLabels.add(CustomLabel(label: label));
+    }
+    return Card(
+      color: Theme.of(context).accentColor,
+      
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 3, right: 3, bottom: 5),
+              child: Wrap(
+                children: customLabels
+              ),
+            ),
+            ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.only(left: 0, right: 0),
+              leading: icon,
+              title: Text(note.title),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    alignment: Alignment.centerRight,
+                    icon: Icon(Icons.delete), 
+                    color: HexColor.fromHex("#E05263"),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    alignment: Alignment.centerRight,
+                    icon: Icon(Icons.edit), 
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () {}
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Widget CustomTextField(){
+    return Container(
+      height: 35,
+      child: TextFormField(
+        style: TextStyle(
+          color: Colors.black
+        ),
+        decoration: InputDecoration(
+          hintText: "\"Indkøb\", \"Dansk\"...",
+          hintStyle: TextStyle(color: Colors.grey, fontSize: 12),
+          isDense: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18)
+          ),
+          filled: true,
+          fillColor: Colors.white
+        ),
+      ),
+    );
+  }
+
+  Widget addNoteDialog(){
+    List<Widget> children = [];
+    List<DropdownMenuItem<NoteType>> notelist = NoteType.values.map<DropdownMenuItem<NoteType>>((nt) => DropdownMenuItem(value: nt, child: Text(nt.toString()))).toList();
+    List<Label> labels = randomLabelList();
+    Color pickerColor = Theme.of(context).primaryColor;
+    Color currentColor = pickerColor;
+
+
+    return StatefulBuilder(builder: (context, setState) {
+      return AlertDialog(
+        scrollable: true,
+        backgroundColor: Theme.of(context).backgroundColor,
+        title: Text("Opret nyt dokument", textAlign: TextAlign.center,),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Text("Titel"),
+              ),
+            ),
+            CustomTextField(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, top: 20),
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Text("Type"),
+              ),
+            ),
+            AddLabelMenu<NoteType>(
+              dropdownMenyItemList: notelist,
+              onChanged: (newValue){
+                setState((){
+                  widget.noteType = newValue;
+                });
+              },
+              value: widget.noteType,
+              isEnabled: true,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, top: 20),
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Text("Labels"),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Wrap(
+                alignment: WrapAlignment.start,
+                  children: children.isEmpty ? [Text('Ingen labels tilføjet')] : children,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, top: 20),
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Text("Tilføj labels"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, top: 20),
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 200,
+                      // child: ListView.builder(
+                      //   shrinkWrap: true,
+                      //   itemCount: labels.length,
+                      //   itemBuilder: (BuildContext context, int index){
+                      //     return CustomLabel(label: labels[index]);
+                      //   },
+                      // ),
+                      child: ListView(
+                        // mainAxisSize: MainAxisSize.min,
+                        children: labels.map((e) => CustomLabel(label: e)).toList(),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        child: Text('Tilføj ny label'),
+                        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+                        onPressed: () {
+                          showDialog(
+                            context: context, 
+                            builder: (context){
+                              return AlertDialog(
+                                backgroundColor: Theme.of(context).backgroundColor,
+                                title: Text('Ny label'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CustomTextField(),
+                                    GestureDetector(
+                                      onTap: (){
+                                        showDialog(
+                                          context: context,
+                                          builder: (context){
+                                            return AlertDialog(
+                                              backgroundColor: Theme.of(context).backgroundColor,
+                                              content: SingleChildScrollView(
+                                                child: BlockPicker(
+                                                  pickerColor: pickerColor,
+                                                  onColorChanged: (newColor){
+                                                    pickerColor = newColor;
+                                                  },
+                                                ),
+                                              ),
+                                              actions: [
+                                                ElevatedButton(
+                                                  child: Text("Anuller"),
+                                                  style: ElevatedButton.styleFrom(primary: Colors.red),
+                                                  onPressed: (){
+                                                    setState((){
+                                                      pickerColor = currentColor;
+                                                    });
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                                ElevatedButton(
+                                                  child: Text("Bekræft"),
+                                                  style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+                                                  onPressed: (){
+                                                    setState((){
+                                                      currentColor = pickerColor;
+                                                    });
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        );
+                                      },
+                                      child: Container(
+                                        color: currentColor,
+                                        width: 100,
+                                        height: 50,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }
+                          );
+                          
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

@@ -1,1 +1,1 @@
-enum NoteType { textDocument, stickyNote, checklist }
+enum NoteType { textDocument, stickyNote, checklist, list }
