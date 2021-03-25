@@ -7,6 +7,7 @@ import 'Components/custom_fab.dart';
 import 'Components/custom_label.dart';
 import 'Models/Note.dart';
 import 'enums/note_type.dart';
+import 'package:note_flutter_app/login.dart';
 import 'extensions.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
@@ -30,13 +31,19 @@ class Main extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
+        textTheme: TextTheme(
+          headline6: TextStyle(
+            fontSize: 36.0,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: HexColor.fromHex("#112D52"),
         primaryColor: HexColor.fromHex("#21E6C1"),
         accentColor: HexColor.fromHex("#1D416F"),
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
       ),
-      home: NoteOverview(title: 'Flutter Demo Home Page'),
+      home: Login(),
     );
   }
 }
