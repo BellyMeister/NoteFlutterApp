@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:note_flutter_app/Components/add_label.dart';
 import 'package:note_flutter_app/Models/Label.dart';
@@ -66,9 +67,43 @@ class NoteOverview extends StatefulWidget {
 
 class _NoteOverviewState extends State<NoteOverview> {
   NoteType noteType;
+  bool _isVisible = true;
+  ScrollController _hideButtonController;
   // final String title;
   // _NoteOverviewState(this.title);
   List<Widget> noteList = [];
+
+@override
+  initState(){
+    super.initState();
+    _isVisible = true;
+    _hideButtonController = new ScrollController();
+    _hideButtonController.addListener((){
+      if(_hideButtonController.position.userScrollDirection == ScrollDirection.reverse){
+        if(_isVisible == true) {
+          /* only set when the previous state is false
+            * Less widget rebuilds 
+            */
+          print("**** ${_isVisible} up"); //Move IO away from setState
+          setState((){
+            _isVisible = false;
+          });
+        }
+      } else {
+        if(_hideButtonController.position.userScrollDirection == ScrollDirection.forward){
+          if(_isVisible == false) {
+            /* only set when the previous state is false
+              * Less widget rebuilds 
+              */
+              print("**** ${_isVisible} down"); //Move IO away from setState
+            setState((){
+              _isVisible = true;
+            });
+          }
+        }
+    }});
+  }
+
   void openRitchTextEdit(context, note) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) =>
@@ -91,7 +126,7 @@ class _NoteOverviewState extends State<NoteOverview> {
 
   @override
   Widget build(BuildContext context) {
-    // noteList = [];
+    noteList.clear();
     for (var note in widget.user.notes) {
       noteList.add(noteCard(note));
     }
@@ -106,31 +141,31 @@ class _NoteOverviewState extends State<NoteOverview> {
               color: HexColor.fromHex("#E05263"),
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Center(
-                        child: AlertDialog(
-                          content: Container(
-                            width: 48.0,
-                            height: 100.0,
-                            child: Column(
-                              children: [
-                                Center(
-                                  child: Text("Want to logout?"),
+                  context: context,
+                  builder: (context) {
+                    return Center(
+                      child: AlertDialog(
+                        content: Container(
+                          width: 48.0,
+                          height: 100.0,
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Text("Want to logout?"),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Color(0xFF21E6C1),
                                 ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFF21E6C1),
-                                  ),
-                                  child: Text('logout'),
-                                  onPressed: () => {logout(context)},
-                                ),
-                              ],
-                            ),
+                                child: Text('logout'),
+                                onPressed: () => {logout(context)},
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    });
+                      ),
+                    );
+                  });
               },
             ),
           ],
@@ -142,22 +177,28 @@ class _NoteOverviewState extends State<NoteOverview> {
           centerTitle: true,
           shadowColor: Colors.transparent,
         ),
-        body: ListView(children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: noteList,
+        body: ListView(
+          controller: _hideButtonController,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: noteList,
+              ),
             ),
-          ),
-        ]),
-        floatingActionButton: CustomFloatingActionButton(callback: () {
-          return showDialog(
+          ]
+        ),
+        floatingActionButton: Visibility(
+          visible: _isVisible,
+          child: CustomFloatingActionButton(callback: () {
+            return showDialog(
               context: context,
               builder: (context) {
                 noteType = NoteType.textDocument;
                 return addNoteDialog();
               });
-        }));
+          }),
+        ));
   }
 
   Widget noteCard(Note note) {
