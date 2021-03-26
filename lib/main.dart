@@ -447,7 +447,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                                                       },
                                                     ),
                                                     ElevatedButton(
-                                                      child: Text("Bekræft1"),
+                                                      child: Text("Bekræft"),
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                               primary: Theme.of(
@@ -475,7 +475,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ElevatedButton(
-                                            child: Text("Bekræft2"),
+                                            child: Text("Bekræft"),
                                             style: ElevatedButton.styleFrom(
                                                 primary: Theme.of(context)
                                                     .primaryColor),
@@ -516,7 +516,7 @@ class _NoteOverviewState extends State<NoteOverview> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                  child: Text("Bekræft3"),
+                  child: Text("Bekræft"),
                   style: ElevatedButton.styleFrom(
                       primary: Theme.of(context).primaryColor),
                   onPressed: () {}),
@@ -541,7 +541,7 @@ class _NoteOverviewState extends State<NoteOverview> {
                 print(noteNameController.text);
               }),
           ElevatedButton(
-              child: Text("Bekræft5"),
+              child: Text("Bekræft"),
               style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor),
               onPressed: () {
