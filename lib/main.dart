@@ -45,6 +45,10 @@ class Main extends StatelessWidget {
             color: Colors.white,
           ),
         ),
+        appBarTheme: AppBarTheme(
+          iconTheme: IconThemeData(color: Colors.white)
+          
+        ),
         backgroundColor: HexColor.fromHex("#112D52"),
         primaryColor: HexColor.fromHex("#21E6C1"),
         accentColor: HexColor.fromHex("#1D416F"),
